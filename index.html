@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Juego de Boxeo</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: radial-gradient(circle, #1a1a1a, #000);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    #game {
+        text-align: center;
+    }
+
+    #glove {
+        font-size: 100px;
+        cursor: pointer;
+        transition: transform 0.1s;
+    }
+
+    /* Animación de golpe */
+    .punch {
+        transform: scale(1.3) rotate(-10deg);
+    }
+
+    #score {
+        font-size: 30px;
+        margin-top: 10px;
+    }
+
+    #combo {
+        color: yellow;
+        font-size: 20px;
+    }
+
+    #timer {
+        font-size: 25px;
+        margin-top: 10px;
+    }
+
+    button {
+        margin-top: 15px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        background: red;
+        color: white;
+        border-radius: 5px;
+    }
+</style>
+
+</head>
+<body>
+
+<div id="game">
+    <h1>🥊 Juego de Golpes</h1>
+
+    <div id="glove">🥊</div>
+
+    <div id="score">Puntos: 0</div>
+    <div id="combo">Combo: x1</div>
+    <div id="timer">Tiempo: 10</div>
+
+    <button onclick="startGame()">Iniciar</button>
+</div>
+
+<!-- Sonido -->
+<audio id="punchSound" src="https://www.soundjay.com/human/punch-1.mp3"></audio>
+
+<script>
+let score = 0;
+let combo = 1;
+let timeLeft = 10;
+let gameActive = false;
+let lastClick = 0;
+let timerInterval;
+
+const glove = document.getElementById("glove");
+const scoreText = document.getElementById("score");
+const comboText = document.getElementById("combo");
+const timerText = document.getElementById("timer");
+const sound = document.getElementById("punchSound");
+
+function startGame() {
+    score = 0;
+    combo = 1;
+    timeLeft = 10;
+    gameActive = true;
+
+    scoreText.textContent = "Puntos: 0";
+    comboText.textContent = "Combo: x1";
+    timerText.textContent = "Tiempo: 10";
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        timerText.textContent = "Tiempo: " + timeLeft;
+
+        if (timeLeft <= 0) {
+            endGame();
+        }
+    }, 1000);
+}
+
+function endGame() {
+    gameActive = false;
+    clearInterval(timerInterval);
+    alert("Fin del juego 🥊\nPuntos: " + score);
+}
+
+glove.addEventListener("click", () => {
+    if (!gameActive) return;
+
+    // Sonido
+    sound.currentTime = 0;
+    sound.play();
+
+    // Animación
+    glove.classList.add("punch");
+    setTimeout(() => glove.classList.remove("punch"), 100);
+
+    // Combo (si hace clic rápido)
+    let now = Date.now();
+    if (now - lastClick < 500) {
+        combo++;
+    } else {
+        combo = 1;
+    }
+
+    lastClick = now;
+
+    score += combo;
+
+    scoreText.textContent = "Puntos: " + score;
+    comboText.textContent = "Combo: x" + combo;
+});
+</script>
+
+</body>
+</html>
